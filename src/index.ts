@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import { testConnection } from "./db/index.js";
 
 const app = express();
 
@@ -11,4 +12,5 @@ app.get("/health",(req:Request,res:Response)=>{
 })
 app.listen(8080, () => {
   console.log("Server running on port 8080");
+   void testConnection();
 });
