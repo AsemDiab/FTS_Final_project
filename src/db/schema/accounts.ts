@@ -1,17 +1,7 @@
-
-import {
-  pgTable,
-  uuid,
-  varchar,
-  timestamp,
-  index,
-} from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, timestamp, index } from "drizzle-orm/pg-core";
 
 import { sql } from "drizzle-orm";
 import { plansTable } from "./plans.js";
-
-
-
 
 export const accountsTable = pgTable(
   "accounts",
@@ -39,7 +29,8 @@ export const accountsTable = pgTable(
       .defaultNow()
       .$onUpdate(() => new Date()),
   },
-  (table) => [
-    index("accounts_plan_id_idx").on(table.planId),
-  ],
+  (table) => [index("accounts_plan_id_idx").on(table.planId)],
 );
+
+export type Account = typeof accountsTable.$inferSelect;
+export type NewAccount = typeof accountsTable.$inferInsert;
