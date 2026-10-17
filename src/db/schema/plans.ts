@@ -1,4 +1,3 @@
-
 import {
   pgTable,
   uuid,
@@ -27,14 +26,14 @@ export const plansTable = pgTable(
 
     perRequestLimit: integer("per_request_limit").notNull(),
 
-    isSystem: boolean("is_system")
-      .notNull()
-      .default(false),
+    isSystem: boolean("is_system").notNull().default(false),
 
-    ownerAccountId: uuid("owner_account_id")
-      .references(() => accountsTable.id, {
+    ownerAccountId: uuid("owner_account_id").references(
+      () => accountsTable.id,
+      {
         onDelete: "cascade",
-      }),
+      },
+    ),
 
     createdAt: timestamp("created_at", {
       withTimezone: true,
@@ -50,15 +49,9 @@ export const plansTable = pgTable(
       .$onUpdate(() => new Date()),
   },
   (table) => [
-    check(
-      "plans_monthly_limit_check",
-      sql`${table.monthlyLimit} >= 0`,
-    ),
+    check("plans_monthly_limit_check", sql`${table.monthlyLimit} >= 0`),
 
-    check(
-      "plans_per_request_limit_check",
-      sql`${table.perRequestLimit} > 0`,
-    ),
+    check("plans_per_request_limit_check", sql`${table.perRequestLimit} > 0`),
 
     check(
       "plans_owner_check",
@@ -67,8 +60,9 @@ export const plansTable = pgTable(
           (${table.isSystem} = false AND ${table.ownerAccountId} IS NOT NULL)`,
     ),
 
-    index("plans_owner_account_idx").on(
-      table.ownerAccountId,
-    ),
+    index("plans_owner_account_idx").on(table.ownerAccountId),
   ],
 );
+
+export type Plan = typeof plansTable.$inferSelect;
+export type NewPlan = typeof plansTable.$inferInsert;
