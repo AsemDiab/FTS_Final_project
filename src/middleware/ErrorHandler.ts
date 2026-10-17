@@ -2,7 +2,6 @@
 import type { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 import { AppError } from "../errors/app-error.js";
-import { translateDbError } from "../errors/db-errors.js";
 
 export const errorHandler: ErrorRequestHandler = (raw, req, res, next) => {
   if (res.headersSent) return next(raw);
@@ -30,8 +29,6 @@ export const errorHandler: ErrorRequestHandler = (raw, req, res, next) => {
       "Request validation failed",
       raw.issues.map((i) => ({ field: i.path.join("."), message: i.message })),
     );
-  } else {
-    err = translateDbError(raw);
   }
 
   if (err instanceof AppError) {
