@@ -1,7 +1,16 @@
 import { Router } from "express";
-import { getPlans, createPlan } from "../controller/plans.controller.js";
+import {
+  getPlans,
+  createPlan,
+  getPlanById,
+  updatePlan,
+  deletePlan,
+} from "../controller/plans.controller.js";
 
 export const plansRouter = Router();
 
 plansRouter.get("/", getPlans);
-plansRouter.post("/", createPlan); // Assuming you have a createPlan function in your controller
+plansRouter.post("/", createPlan);
+plansRouter.get("/:planId", getPlanById);
+plansRouter.put("/:planId", updatePlan);
+plansRouter.delete("/:planId", deletePlan);
