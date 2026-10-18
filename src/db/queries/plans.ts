@@ -1,22 +1,20 @@
 import { db } from "../index.js";
-import { accountsTable, Plan, Plan, plansTable } from "../schema.js";
-import { eq, or } from "drizzle-orm";
-export async function getPlansQuery(
-  ownedByAccountId: string | null,
-): Promise<any[]> {
-  const plans = await db
+import { accountsTable, Plan, plansTable } from "../schema.js";
+import { eq, or, isNull } from "drizzle-orm";
+
+export async function getPlansQuery(ownedByAccountId: string | null) {
+  return db
     .select()
     .from(plansTable)
     .where(
       or(
-        eq(plansTable.ownerAccountId, ownedByAccountId),
-        eq(plansTable.isSystem, true),
+        isNull(plansTable.ownerAccountId),
+        ...(ownedByAccountId
+          ? [eq(plansTable.ownerAccountId, ownedByAccountId)]
+          : []),
       ),
     );
-
-  return plans;
 }
-
 export async function createPlanQuery(planData: any): Promise<any> {
   const ownerAccountId = planData.ownerAccountId ?? null;
   const isSystem = ownerAccountId === null || ownerAccountId === undefined;
