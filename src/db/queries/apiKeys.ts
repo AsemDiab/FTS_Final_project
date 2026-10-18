@@ -1,6 +1,7 @@
-import { db } from "../db/index.js";
-import { apiKeysTable } from "../db/schema.js";
+import { db } from "../index.js";
 import { eq, and, isNull, or, gt, desc } from "drizzle-orm";
+import { apiKeysTable } from "../schema.js";
+import { createHash } from "node:crypto";
 
 export async function createApiKeyQuery(data: {
   keyHash: string;
@@ -110,4 +111,17 @@ export async function getActiveApiKeysByAccountIdQuery(accountId: string) {
       ),
     )
     .orderBy(desc(apiKeysTable.createdAt));
+}
+
+export async function getAccountIDByApiKeyQuery(
+  apiKey: string,
+): Promise<string | null> {
+  const keyHash = createHash("sha256").update(apiKey).digest("hex");
+  const [apiKeyRecord] = await db
+    .select({ accountId: apiKeysTable.accountId })
+    .from(apiKeysTable)
+    .where(eq(apiKeysTable.keyHash, keyHash))
+    .limit(1);
+
+  return apiKeyRecord?.accountId ?? null;
 }

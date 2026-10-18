@@ -56,3 +56,22 @@ export async function deletePlanQuery(planId: string): Promise<boolean> {
 
   return deletedCount > 0;
 }
+
+export async function getPlanByIdAndAccountIdQuery(
+  planId: string,
+  accountId: string,
+): Promise<any | null> {
+  const plan = await db
+    .select()
+    .from(plansTable)
+    .where(
+      eq(plansTable.id, planId),
+      or(
+        isNull(plansTable.ownerAccountId),
+        eq(plansTable.ownerAccountId, accountId),
+      ),
+    )
+    .limit(1)
+    .then((rows: Plan[]) => rows[0] || null);
+  return plan;
+}

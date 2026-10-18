@@ -3,7 +3,7 @@ import { config } from "../config.js";
 import { UnauthorizedError } from "../errors/http-errors.js";
 
 export function adminAuth(req: Request, res: Response, next: NextFunction) {
-  const apiKey = req.header("x-admin-api-key");
+  const apiKey = req.header("X-Admin-Key");
   const adminApiKey = config.api.adminKey;
 
   if (!adminApiKey) {

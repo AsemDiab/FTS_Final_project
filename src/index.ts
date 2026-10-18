@@ -14,7 +14,7 @@ app.use(
   (await import("./routes/accounts.route.js")).accountsRouter,
 );
 app.use("/api/v1/plans", (await import("./routes/plans.route.js")).plansRouter);
-
+app.use("/api/v1/users", (await import("./routes/users.routes.js")).userRouter);
 app.use(errorHandler);
 app.listen(8080, () => {
   console.log("Server running on port 8080");
