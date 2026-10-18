@@ -9,7 +9,7 @@ import {
   revokeApiKeyQuery,
 } from "../db/queries/apiKeys.js";
 import { getPlanByIdQuery } from "../db/queries/plans.js";
-import { NotFoundError } from "../errors/http-errors.js";
+import { NotFoundError, UnauthorizedError } from "../errors/http-errors.js";
 import { generateApiKey } from "../utils/api-key.js";
 
 export async function createAccountService(data: {
@@ -21,6 +21,17 @@ export async function createAccountService(data: {
   const plan = await getPlanByIdQuery(planId);
   if (!plan) {
     throw new NotFoundError("PLAN_NOT_FOUND", "Plan not found");
+  }
+
+  if (!plan.isSystem) {
+    throw new UnauthorizedError(
+      "The specified plan is not available for new accounts",
+    );
+  }
+
+  console.log("Plan retrieved:", plan);
+  if (plan.type !== "account") {
+    throw new UnauthorizedError("The specified plan is not an account plan");
   }
 
   const newAccountData = { name, planId };
