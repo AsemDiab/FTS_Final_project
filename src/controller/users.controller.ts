@@ -4,8 +4,10 @@ import {
   createUserService,
   getUserByIdService,
   getUsersService,
+  getUserUsageService,
 } from "../services/user.service.js";
 import { BadRequestError } from "../errors/http-errors.js";
+import { getAccountIDByApiKeyQuery } from "../db/queries/apiKeys.js";
 
 // POST /api/v1/users
 export async function createUser(req: Request, res: Response): Promise<void> {
@@ -81,16 +83,24 @@ export async function changeUserPlan(
 }
 
 // // GET /api/v1/users/:userId/usage
-// export async function getUserUsage(req: Request, res: Response): Promise<void> {
-//   const accountId = req.accountId;
-//   const { userId } = req.params;
+export async function getUserUsage(req: Request, res: Response): Promise<void> {
+  const apiKey = req.headers["x-api-key"];
+  if (!apiKey || typeof apiKey !== "string") {
+    throw new BadRequestError("Missing or invalid API key");
+  }
+  const accountId = await getAccountIDByApiKeyQuery(apiKey);
 
-//   const usage = await getUserUsageService({
-//     accountId,
-//     userId,
-//   });
+  if (!accountId) {
+    throw new BadRequestError("Invalid API key");
+  }
+  const { userId } = req.params;
 
-//   res.status(200).json({
-//     data: usage,
-//   });
-// }
+  const usage = await getUserUsageService({
+    accountId,
+    userId,
+  });
+
+  res.status(200).json({
+    data: usage,
+  });
+}

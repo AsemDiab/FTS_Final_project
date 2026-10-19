@@ -4,6 +4,7 @@ import {
   createUser,
   getUserById,
   getUsers,
+  getUserUsage,
 } from "../controller/users.controller.js";
 
 /*
@@ -26,4 +27,4 @@ userRouter.get("/:userId", getUserById);
 
 userRouter.patch("/:userId/plan", changeUserPlan);
 
-// userRouter.get("/:userId/usage", getUserUsage);
+userRouter.get("/:userId/usage", getUserUsage);

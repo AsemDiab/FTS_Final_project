@@ -14,6 +14,7 @@ import {
 } from "../errors/http-errors.js";
 import { getAccountIDByApiKeyQuery } from "../db/queries/apiKeys.js";
 import { Plan } from "../db/schema.js";
+import { getUserUsageHistoryQuery } from "../db/queries/usage.js";
 
 // POST /api/v1/users
 export async function createUserService(data: {
@@ -85,4 +86,18 @@ export async function changeUserPlanService(data: {
   }
 
   return user;
+}
+
+export async function getUserUsageService(data: {
+  accountId: string;
+  userId: string;
+}) {
+  const user = await findUserById(data.accountId, data.userId);
+
+  if (!user) {
+    throw new NotFoundError("USER_NOT_FOUND", "User not found");
+  }
+
+  const usage = await getUserUsageHistoryQuery(data.accountId, data.userId);
+  return usage;
 }
