@@ -54,3 +54,13 @@ export async function updateUserPlan(
 
   return user ?? null;
 }
+
+export async function getUserPlanQuery(userId: string) {
+  const [user] = await db
+    .select({ planId: usersTable.planId })
+    .from(usersTable)
+    .where(eq(usersTable.id, userId))
+    .limit(1);
+
+  return user?.planId ?? null;
+}

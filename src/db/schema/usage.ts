@@ -1,4 +1,3 @@
-
 import {
   pgTable,
   uuid,
@@ -13,12 +12,11 @@ import {
 
 import { sql } from "drizzle-orm";
 import { apiKeysTable } from "./api-keys.js";
-import { rejectionReasonEnum, rejectionScopeEnum, usageOutcomeEnum } from "./enums.js";
-
-
-
-
-
+import {
+  rejectionReasonEnum,
+  rejectionScopeEnum,
+  usageOutcomeEnum,
+} from "./enums.js";
 
 export const usageTable = pgTable(
   "usage",
@@ -43,19 +41,13 @@ export const usageTable = pgTable(
 
     requestedUnits: integer("requested_units").notNull(),
 
-    consumedUnits: integer("consumed_units")
-      .notNull()
-      .default(0),
+    consumedUnits: integer("consumed_units").notNull().default(0),
 
     outcome: usageOutcomeEnum("outcome").notNull(),
 
-    rejectionScope: rejectionScopeEnum(
-      "rejection_scope",
-    ),
+    rejectionScope: rejectionScopeEnum("rejection_scope"),
 
-    rejectionReason: rejectionReasonEnum(
-      "rejection_reason",
-    ),
+    rejectionReason: rejectionReasonEnum("rejection_reason"),
 
     createdAt: timestamp("created_at", {
       withTimezone: true,
@@ -64,21 +56,11 @@ export const usageTable = pgTable(
       .defaultNow(),
   },
   (table) => [
-    unique("usage_account_request_unique").on(
-      table.accountId,
-      table.requestId,
-    ),
+    unique("usage_account_request_unique").on(table.accountId, table.requestId),
 
+    check("usage_requested_units_positive", sql`${table.requestedUnits} > 0`),
 
-    check(
-      "usage_requested_units_positive",
-      sql`${table.requestedUnits} > 0`,
-    ),
-
-    check(
-      "usage_consumed_units_nonnegative",
-      sql`${table.consumedUnits} >= 0`,
-    ),
+    check("usage_consumed_units_nonnegative", sql`${table.consumedUnits} >= 0`),
 
     check(
       "usage_outcome_consistency",
@@ -95,14 +77,10 @@ export const usageTable = pgTable(
       )`,
     ),
 
-    index("usage_account_created_idx").on(
-      table.accountId,
-      table.createdAt,
-    ),
+    index("usage_account_created_idx").on(table.accountId, table.createdAt),
 
-    index("usage_user_created_idx").on(
-      table.userId,
-      table.createdAt,
-    ),
+    index("usage_user_created_idx").on(table.userId, table.createdAt),
   ],
 );
+
+export type newUsage = typeof usageTable.$inferInsert;

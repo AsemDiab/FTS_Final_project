@@ -21,7 +21,7 @@ function asyncHandler(
   };
 }
 
-function getAccountId(res: Response): string {
+export function getAccountId(res: Response): string {
   const accountId: unknown = res.locals.accountId;
 
   if (typeof accountId !== "string" || !accountId) {
