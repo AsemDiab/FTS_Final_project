@@ -13,7 +13,7 @@ export async function consumeController(
   const { userId, requestId, units } = req.body;
 
   // These values must be set by your API key authentication middleware.
-  const accountId = getAccountId(res);
+  const accountId = getAccountId(req);
   if (!accountId) throw new UnauthorizedError();
   const apiKeyRecord = await getApiKeyByHashQuery(
     createHash("sha256").update(req.header("x-api-key")).digest("hex"),

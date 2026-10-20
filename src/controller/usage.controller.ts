@@ -21,8 +21,8 @@ function asyncHandler(
   };
 }
 
-export function getAccountId(res: Response): string {
-  const accountId: unknown = res.locals.accountId;
+export function getAccountId(req: Request): string {
+  const accountId: unknown = req.locals.accountId;
 
   if (typeof accountId !== "string" || !accountId) {
     throw new UnauthorizedError();
@@ -64,7 +64,7 @@ function getOptionalInteger(value: unknown, field: string): number | undefined {
 // GET /api/v1/usage?period=2026-10
 export const getAccountUsageSummaryController = asyncHandler(
   async (req, res) => {
-    const accountId = getAccountId(res);
+    const accountId = getAccountId(req);
     const period = getOptionalString(req.query.period, "period");
 
     const summary = await getAccountUsageSummaryService(accountId, period);
@@ -79,7 +79,7 @@ export const getAccountUsageSummaryController = asyncHandler(
 // GET /api/v1/usage/history?page=1&limit=20
 export const getAccountUsageHistoryController = asyncHandler(
   async (req, res) => {
-    const accountId = getAccountId(res);
+    const accountId = getAccountId(req);
 
     const page = getOptionalInteger(req.query.page, "page");
     const limit = getOptionalInteger(req.query.limit, "limit");
@@ -98,7 +98,7 @@ export const getAccountUsageHistoryController = asyncHandler(
 
 // GET /api/v1/users/:userId/usage?period=2026-10
 export const getUserUsageSummaryController = asyncHandler(async (req, res) => {
-  const accountId = getAccountId(res);
+  const accountId = getAccountId(req);
   const userId = req.params.userId;
   const period = getOptionalString(req.query.period, "period");
 
@@ -112,7 +112,7 @@ export const getUserUsageSummaryController = asyncHandler(async (req, res) => {
 
 // GET /api/v1/users/:userId/usage/history?page=1&limit=20
 export const getUserUsageHistoryController = asyncHandler(async (req, res) => {
-  const accountId = getAccountId(res);
+  const accountId = getAccountId(req);
   const userId = req.params.userId;
 
   const page = getOptionalInteger(req.query.page, "page");

@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import { getAccountsQuery } from "../db/queries/accounts.js";
+import {
+  getAccountByIdQuery,
+  getAccountsQuery,
+} from "../db/queries/accounts.js";
 import { BadRequestError, NotFoundError } from "../errors/http-errors.js";
 import {
   createAccountService,
@@ -32,15 +35,7 @@ export async function getAccountByApiKeyController(
   req: Request,
   res: Response,
 ) {
-  console.log("Received request to get account by API key", req.headers);
-  const apiKey = req.get("x-api-key");
-  console.log("API Key received:", apiKey);
-  if (!apiKey) {
-    throw new BadRequestError("API key is required");
-  }
-
-  const account = await getAccountByApiKeyService(apiKey);
-  console.log("Account found:", account);
+  const account = await getAccountByIdQuery(req.locals.accountId);
   if (!account) {
     throw new NotFoundError("ACCOUNT_NOT_FOUND", "Account not found");
   }
@@ -64,12 +59,7 @@ export async function getAccountAPIKeysController(req: Request, res: Response) {
 }
 
 export async function createNewApiKeyController(req: Request, res: Response) {
-  const apiKey = req.get("x-api-key");
-  if (!apiKey) {
-    throw new BadRequestError("API key is required");
-  }
-
-  const account = await getAccountByApiKeyService(apiKey);
+  const account = await getAccountByIdQuery(req.locals.accountId);
   if (!account) {
     throw new NotFoundError("ACCOUNT_NOT_FOUND", "Account not found");
   }
@@ -79,12 +69,7 @@ export async function createNewApiKeyController(req: Request, res: Response) {
 }
 
 export async function revokeApiKeyController(req: Request, res: Response) {
-  const apiKey = req.get("x-api-key");
-  if (!apiKey) {
-    throw new BadRequestError("API key is required");
-  }
-
-  const account = await getAccountByApiKeyService(apiKey);
+  const account = await getAccountByIdQuery(req.locals.accountId);
   if (!account) {
     throw new NotFoundError("ACCOUNT_NOT_FOUND", "Account not found");
   }

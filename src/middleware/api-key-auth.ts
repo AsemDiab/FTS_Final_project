@@ -39,7 +39,7 @@ export const apiKeyAuth: RequestHandler = async (req, res, next) => {
   }
 
   // The authenticated account ID is trusted by downstream handlers.
-  res.locals.accountId = accountId;
+  req.locals.accountId = accountId;
 
   next();
 };
